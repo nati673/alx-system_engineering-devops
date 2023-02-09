@@ -1,0 +1,15 @@
+ -a | awk -F / '
+
+  /\/$/ {
+
+    printf "%s", $0","
+
+    next
+
+  }
+
+  { printf "%s,", $0 }
+
+  END { print "" }
+
+' | sort -k 1.1 | sed 's/,$//'
