@@ -1,2 +1,2 @@
-i#!/bin/bash 
-tr Ac Ze
+#!/bin/bash 
+tr Ac Z:e
