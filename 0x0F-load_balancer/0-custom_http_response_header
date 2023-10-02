@@ -1,33 +1,15 @@
-nstalls Nginx with the following configurations:
-#+    Listens on port 80.
-#+    Returns a page containing "Hello World!" when queried
-#+     at the root with a curl GET request.
-# Configures /redirect_me as a "301 Moved Permanently".
-# Includes a custom 404 page containing "Ceci n'est pas une page".
+#!/usr/bin/env bash
+# setup additional web server
+WHERE="/etc/nginx/sites-available/default"
+ADD="\\\tlocation \/redirect_me {\n\t\treturn 301 https://youtube.com/watch?v=QH2-TGUlwu4;\n\t}\n"
+E404="\\\n\terror_page 404 /custom_404.html;\n\tlocation = /custom_404.html {\n\t\troot /usr/share/nginx/html;\n\t\tinternal;\n\t}\n"
+HEADER="\\\n\tadd_header X-Served-By \$hostname;\n"
 
-sudo apt-get update
-sudo apt-get install -y nginx
-
-sudo mkdir /etc/nginx/html
-sudo touch /etc/nginx/html/index.html
-echo "Hello World!" > /etc/nginx/html/index.html
-sudo touch /etc/nginx/html/404.html
-echo "Ceci n'est pas une page" > /etc/nginx/html/404.html
-
-printf %s "server {
-    listen 80;
-    listen [::]:80 default_server;
-    add_header X-Served-By $HOSTNAME;
-    root   /etc/nginx/html;
-    index  index.html index.htm;
-    location /redirect_me {
-       return 301 https://youtu.be/3_mt7qZldLs;
-    }
-    error_page 404 /404.html;
-    location /404 {
-      root /etc/nginx/html;
-      internal;
-    }
-}" > /etc/nginx/sites-available/default
-
-sudo service nginx restart
+apt-get -y update
+apt-get install -y nginx
+echo "codingschool School" | sudo tee /usr/share/nginx/html/index.html
+sed -i "30i $ADD" $WHERE
+echo -e "Ceci n'est pas une page\n" | sudo tee /usr/share/nginx/html/custom_404.html
+sed -i "48i $E404" $WHERE
+sed -i "29i $HEADER" $WHERE
+service nginx restart
